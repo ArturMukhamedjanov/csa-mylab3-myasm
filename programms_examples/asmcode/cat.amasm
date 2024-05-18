@@ -1,0 +1,25 @@
+org 0
+int_addr: word: interrupt
+org 2
+line_end: word: 10          ; end-of-line code
+stop_input: word: 0         ; flag
+in: word: 2046
+out: word: 2047
+
+org 10
+start: ei
+    loop: load stop_input   ; spin-loop cycle
+    jmz loop
+    hlt
+
+interrupt: push             ; save accumulator
+    load (in)               ; read symbol
+    cmp line_end            ; check is it end of string
+    jmnz print              ; print if not end-of-line
+    load stop_input         ; increase flag
+    inc
+    store stop_input
+    jmp end
+    print: store (out)      ; output symbol
+    end: pop                ; restore accumulator
+    iret

@@ -1,0 +1,29 @@
+org 1
+i: word: 0
+n: word: 1000    
+sum: word: 0       
+out: word: 2047
+five: word: 5
+three: word: 3
+
+start: cla
+    loop: load i
+    inc
+    store i
+    cmp n
+    jmz end
+    load i
+    mod three
+    jmz add
+    load i
+    mod five
+    jmz add
+    jmp loop
+    end: load sum
+    store (out)
+    hlt
+
+add: load i
+    add sum
+    store sum
+    jmp loop
