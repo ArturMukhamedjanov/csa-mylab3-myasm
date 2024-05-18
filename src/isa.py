@@ -106,27 +106,6 @@ def is_op_command(text):
 def is_nop_command(text):
     return text in nop_commands
 
-
-def read_code(source):
-    with open(source) as file:
-        data = file.read()
-        array_of_dicts = eval(data)
-        start_addr = array_of_dicts[0]["start_addr"]
-        array_of_dicts.remove(array_of_dicts[0])
-    return int(start_addr), array_of_dicts
-
-
-def write_code(code_target, start_address, code):
-    with open(code_target, encoding="utf-8", mode="w") as f:
-        f.write("[\n")
-        f.write("{'start_addr': " + str(start_address) + " },\n")
-        for i in range(len(code)):
-            line = code[i]
-            f.write(str(line))
-            if i != len(code) - 1:
-                f.write(",\n")
-        f.write("]\n")
-
 def write_binary_code(code_target, start_adress, binary):
     with open(code_target, "wb") as binary_file:
         binary_file.write(start_adress.to_bytes(4, byteorder='big'))
