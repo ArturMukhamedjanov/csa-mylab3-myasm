@@ -196,6 +196,7 @@ class ControlUnit:
             self.instr_counter += 1
             #Вывод состояние после инструкции
             self.__print__("")
+            #logger.info("\n")
         if self.instr_counter >= self.limit:
             pass
             print("Limit exceeded!")
@@ -338,7 +339,7 @@ class ControlUnit:
                 # унарная арифметическая операция
                 self.sig_latch_reg("AC", self.calc(self.get_reg("AC"), None, opcode, True))
                 self.tick(mode + cycle + " " + opcode + " AC -> AC")
-        logger.info("\n")
+        #logger.info("\n")
         return True  # executed successfully
 
     def __print_symb__(self, text):
@@ -361,7 +362,7 @@ class ControlUnit:
             self.get_reg("CR")["opcode"]
             + (lambda x: " " + str(x["operand"]) if "operand" in x.keys() else "")(self.get_reg("CR")),
         )
-        logger.info(state_repr + " " + comment)
+        logger.info(state_repr)
 
 
 def simulation(code, limit, input_data, start_addr):
