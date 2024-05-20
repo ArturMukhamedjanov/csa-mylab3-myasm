@@ -1,0 +1,142 @@
+in_source: |-
+  org 0
+  int_addr: word: interrupt
+  org 2
+  line_end: word: 10          ; end-of-line code
+  stop_input: word: 0         ; flag
+  in: word: 2046
+  out: word: 2047
+
+  org 10
+  start: ei
+      loop: load stop_input   ; spin-loop cycle
+      jmz loop
+      hlt
+
+  interrupt: push             ; save accumulator
+      load (in)               ; read symbol
+      cmp line_end            ; check is it end of string
+      jmnz print              ; print if not end-of-line
+      load stop_input         ; increase flag
+      inc
+      store stop_input
+      jmp end
+      print: store (out)      ; output symbol
+      end: pop                ; restore accumulator
+      iret
+in_stdin: |-
+  [(30, 'h'), (80, 'e'), (130, 'l'),  (140, 'l'), (180, 'o'), (210, '!'), (230, '\n')]
+out_code_debug: |
+  0 - 00000000000000000000000000001110 - value: 14
+  2 - 00000000000000000000000000001010 - value: 10
+  3 - 00000000000000000000000000000000 - value: 0
+  4 - 00000000000000000000011111111110 - value: 2046
+  5 - 00000000000000000000011111111111 - value: 2047
+  10 - 10010110000000000000000000000000 - mnemonic: ei
+  11 - 11000001000000000110000000000000 - mnemonic: load operand: 3
+  12 - 11001000000000010110000000000000 - mnemonic: jmz operand: 11
+  13 - 10001100000000000000000000000000 - mnemonic: hlt
+  14 - 10010011000000000000000000000000 - mnemonic: push
+  15 - 11100001000000001000000000000000 - mnemonic: load operand: 4
+  16 - 11000011000000000100000000000000 - mnemonic: cmp operand: 2
+  17 - 11001001000000101100000000000000 - mnemonic: jmnz operand: 22
+  18 - 11000001000000000110000000000000 - mnemonic: load operand: 3
+  19 - 10010001000000000000000000000000 - mnemonic: inc
+  20 - 11000010000000000110000000000000 - mnemonic: store operand: 3
+  21 - 11000101000000101110000000000000 - mnemonic: jmp operand: 23
+  22 - 11100010000000001010000000000000 - mnemonic: store operand: 5
+  23 - 10010100000000000000000000000000 - mnemonic: pop
+  24 - 10001110000000000000000000000000 - mnemonic: iret
+out_stdout: |
+  source LoC: 25 code instr: 20
+  ============================================================
+  Output: ['h', 'e', 'l', 'l', 'o', '!']
+  Instruction number: 72
+  Ticks: 284
+out_log: |
+  INFO     machine_logger:machine.py:365 TICK:    2 | AC 0       | IP: 11   | AR: 10   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: ei           |
+  INFO     machine_logger:machine.py:365 TICK:    5 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:    8 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   11 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   14 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   17 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   20 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   23 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   26 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   29 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:182 INPUT h
+  INFO     machine_logger:machine.py:365 TICK:   40 | AC 0       | IP: 15   | AR: 2043 | PS: 10010 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:   44 | AC 104     | IP: 16   | AR: 2046 | PS: 10000 | DR: 104     | SP : 2042 | mem[AR] 104     | mem[SP] : 0   | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:   47 | AC 104     | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2042 | mem[AR] 10      | mem[SP] : 0   | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:   50 | AC 104     | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 0   | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:125 OUTPUT h
+  INFO     machine_logger:machine.py:365 TICK:   54 | AC 104     | IP: 23   | AR: 2047 | PS: 10001 | DR: 104     | SP : 2042 | mem[AR] 104     | mem[SP] : 0   | CR: store 5      |
+  INFO     machine_logger:machine.py:365 TICK:   56 | AC 0       | IP: 24   | AR: 2043 | PS: 10010 | DR: 0       | SP : 2043 | mem[AR] 0       | mem[SP] : 0   | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:   60 | AC 0       | IP: 11   | AR: 2045 | PS: 10010 | DR: 18      | SP : 2045 | mem[AR] 18      | mem[SP] : 18  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:   63 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   66 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   69 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   72 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:   75 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:   78 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:182 INPUT e
+  INFO     machine_logger:machine.py:365 TICK:   89 | AC 0       | IP: 15   | AR: 2043 | PS: 10010 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:   93 | AC 101     | IP: 16   | AR: 2046 | PS: 10000 | DR: 101     | SP : 2042 | mem[AR] 101     | mem[SP] : 0   | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:   96 | AC 101     | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2042 | mem[AR] 10      | mem[SP] : 0   | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:   99 | AC 101     | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 0   | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:125 OUTPUT e
+  INFO     machine_logger:machine.py:365 TICK:  103 | AC 101     | IP: 23   | AR: 2047 | PS: 10001 | DR: 101     | SP : 2042 | mem[AR] 101     | mem[SP] : 0   | CR: store 5      |
+  INFO     machine_logger:machine.py:365 TICK:  105 | AC 0       | IP: 24   | AR: 2043 | PS: 10010 | DR: 0       | SP : 2043 | mem[AR] 0       | mem[SP] : 0   | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:  109 | AC 0       | IP: 12   | AR: 2045 | PS: 10010 | DR: 18      | SP : 2045 | mem[AR] 18      | mem[SP] : 18  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:  112 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:  115 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:  118 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:  121 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:  124 | AC 0       | IP: 11   | AR: 11   | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
+  INFO     machine_logger:machine.py:365 TICK:  127 | AC 0       | IP: 12   | AR: 3    | PS: 10010 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:182 INPUT l
+  INFO     machine_logger:machine.py:365 TICK:  138 | AC 0       | IP: 15   | AR: 2043 | PS: 10010 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:182 INPUT l
+  INFO     machine_logger:machine.py:365 TICK:  150 | AC 108     | IP: 15   | AR: 2040 | PS: 10000 | DR: 108     | SP : 2039 | mem[AR] 108     | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:  154 | AC 108     | IP: 16   | AR: 2046 | PS: 10000 | DR: 108     | SP : 2039 | mem[AR] 108     | mem[SP] : 0   | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:  157 | AC 108     | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2039 | mem[AR] 10      | mem[SP] : 0   | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:  160 | AC 108     | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2039 | mem[AR] 0       | mem[SP] : 0   | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:125 OUTPUT l
+  INFO     machine_logger:machine.py:365 TICK:  164 | AC 108     | IP: 23   | AR: 2047 | PS: 10001 | DR: 108     | SP : 2039 | mem[AR] 108     | mem[SP] : 0   | CR: store 5      |
+  INFO     machine_logger:machine.py:365 TICK:  166 | AC 108     | IP: 24   | AR: 2040 | PS: 10000 | DR: 108     | SP : 2040 | mem[AR] 108     | mem[SP] : 108 | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:  170 | AC 108     | IP: 16   | AR: 2042 | PS: 10000 | DR: 16      | SP : 2042 | mem[AR] 16      | mem[SP] : 16  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:  173 | AC 108     | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2042 | mem[AR] 10      | mem[SP] : 16  | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:  176 | AC 108     | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2042 | mem[AR] 0       | mem[SP] : 16  | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:125 OUTPUT l
+  INFO     machine_logger:machine.py:182 INPUT o
+  INFO     machine_logger:machine.py:365 TICK:  188 | AC 108     | IP: 15   | AR: 2040 | PS: 10001 | DR: 108     | SP : 2039 | mem[AR] 108     | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:  192 | AC 111     | IP: 16   | AR: 2046 | PS: 10000 | DR: 111     | SP : 2039 | mem[AR] 111     | mem[SP] : 0   | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:  195 | AC 111     | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2039 | mem[AR] 10      | mem[SP] : 0   | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:  198 | AC 111     | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2039 | mem[AR] 0       | mem[SP] : 0   | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:125 OUTPUT o
+  INFO     machine_logger:machine.py:365 TICK:  202 | AC 111     | IP: 23   | AR: 2047 | PS: 10001 | DR: 111     | SP : 2039 | mem[AR] 111     | mem[SP] : 0   | CR: store 5      |
+  INFO     machine_logger:machine.py:365 TICK:  204 | AC 108     | IP: 24   | AR: 2040 | PS: 10000 | DR: 108     | SP : 2040 | mem[AR] 108     | mem[SP] : 108 | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:  208 | AC 108     | IP: 23   | AR: 2042 | PS: 10001 | DR: 17      | SP : 2042 | mem[AR] 17      | mem[SP] : 17  | CR: iret         |
+  INFO     machine_logger:machine.py:182 INPUT !
+  INFO     machine_logger:machine.py:365 TICK:  218 | AC 0       | IP: 15   | AR: 2041 | PS: 10010 | DR: 0       | SP : 2040 | mem[AR] 0       | mem[SP] : 108 | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:  222 | AC 33      | IP: 16   | AR: 2046 | PS: 10000 | DR: 33      | SP : 2040 | mem[AR] 33      | mem[SP] : 108 | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:  225 | AC 33      | IP: 17   | AR: 2    | PS: 10001 | DR: 10      | SP : 2040 | mem[AR] 10      | mem[SP] : 108 | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:  228 | AC 33      | IP: 22   | AR: 22   | PS: 10001 | DR: 0       | SP : 2040 | mem[AR] 0       | mem[SP] : 108 | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:182 INPUT
+
+  INFO     machine_logger:machine.py:125 OUTPUT !
+  INFO     machine_logger:machine.py:365 TICK:  240 | AC 33      | IP: 15   | AR: 2038 | PS: 10001 | DR: 33      | SP : 2037 | mem[AR] 33      | mem[SP] : 0   | CR: push         |
+  INFO     machine_logger:machine.py:365 TICK:  244 | AC 10      | IP: 16   | AR: 2046 | PS: 10000 | DR: 10      | SP : 2037 | mem[AR] 10      | mem[SP] : 0   | CR: load 4       |
+  INFO     machine_logger:machine.py:365 TICK:  247 | AC 10      | IP: 17   | AR: 2    | PS: 10011 | DR: 10      | SP : 2037 | mem[AR] 10      | mem[SP] : 0   | CR: cmp 2        |
+  INFO     machine_logger:machine.py:365 TICK:  250 | AC 10      | IP: 18   | AR: 22   | PS: 10011 | DR: 0       | SP : 2037 | mem[AR] 0       | mem[SP] : 0   | CR: jmnz 22      |
+  INFO     machine_logger:machine.py:365 TICK:  253 | AC 0       | IP: 19   | AR: 3    | PS: 10010 | DR: 0       | SP : 2037 | mem[AR] 0       | mem[SP] : 0   | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:  255 | AC 1       | IP: 20   | AR: 19   | PS: 10000 | DR: 0       | SP : 2037 | mem[AR] 0       | mem[SP] : 0   | CR: inc          |
+  INFO     machine_logger:machine.py:365 TICK:  258 | AC 1       | IP: 21   | AR: 3    | PS: 10000 | DR: 1       | SP : 2037 | mem[AR] 1       | mem[SP] : 0   | CR: store 3      |
+  INFO     machine_logger:machine.py:365 TICK:  261 | AC 1       | IP: 23   | AR: 23   | PS: 10000 | DR: 0       | SP : 2037 | mem[AR] 0       | mem[SP] : 0   | CR: jmp 23       |
+  INFO     machine_logger:machine.py:365 TICK:  263 | AC 33      | IP: 24   | AR: 2038 | PS: 10000 | DR: 33      | SP : 2038 | mem[AR] 33      | mem[SP] : 33  | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:  267 | AC 33      | IP: 23   | AR: 2040 | PS: 10001 | DR: 17      | SP : 2040 | mem[AR] 17      | mem[SP] : 17  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:  269 | AC 0       | IP: 24   | AR: 2041 | PS: 10010 | DR: 0       | SP : 2041 | mem[AR] 0       | mem[SP] : 0   | CR: pop          |
+  INFO     machine_logger:machine.py:365 TICK:  273 | AC 0       | IP: 24   | AR: 2043 | PS: 10010 | DR: 18      | SP : 2043 | mem[AR] 18      | mem[SP] : 18  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:  277 | AC 0       | IP: 11   | AR: 2045 | PS: 10010 | DR: 18      | SP : 2045 | mem[AR] 18      | mem[SP] : 18  | CR: iret         |
+  INFO     machine_logger:machine.py:365 TICK:  280 | AC 1       | IP: 12   | AR: 3    | PS: 10000 | DR: 1       | SP : 2045 | mem[AR] 1       | mem[SP] : 18  | CR: load 3       |
+  INFO     machine_logger:machine.py:365 TICK:  283 | AC 1       | IP: 13   | AR: 11   | PS: 10000 | DR: 0       | SP : 2045 | mem[AR] 0       | mem[SP] : 18  | CR: jmz 11       |
