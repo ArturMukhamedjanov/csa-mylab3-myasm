@@ -11,7 +11,7 @@ import pytest
 def normalize_whitespace(s):
     return ' '.join(s.split())
 
-@pytest.mark.golden_test("golden/*.yml")
+@pytest.mark.golden_test("golden_prob/*.yml")
 def test_translator_and_machine(golden, caplog):
     caplog.set_level(logging.INFO)
 

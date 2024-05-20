@@ -29,3 +29,5 @@ jobs:
 
     - name: Run integration tests
       run: pytest src/integration_test.py  # Замените на путь к вашему тестовому файлу
+    - name: Run prob test
+      run: pytest src/prob_test.py
