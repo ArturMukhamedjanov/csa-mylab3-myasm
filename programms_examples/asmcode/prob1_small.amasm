@@ -1,6 +1,6 @@
 org 1
 i: word: 0
-n: word: 1000    
+n: word: 50   
 sum: word: 0       
 out: word: 2047
 five: word: 5
